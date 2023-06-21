@@ -7,7 +7,7 @@ import torch.optim as optim
 import torchvision.models as models
 import requests
 
-st.header('Sapling Classification')
+st.header('Sapling Classification 🌱🌱')
 
 # Define the image transformation pipeline
 transform = transforms.Compose([

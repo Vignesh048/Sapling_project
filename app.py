@@ -35,6 +35,19 @@ model.fc = nn.Sequential(
     nn.Linear(128, 1)
 )  # Binary classification, output layer with 1 neuron
 
+import requests
+
+url = "https://storage.googleapis.com/sapling_bucket/sapling.pth"
+filename = "sapling.pth"
+
+response = requests.get(url)
+response.raise_for_status()  # Check if the request was successful
+
+with open(filename, "wb") as file:
+    file.write(response.content)
+
+print("File downloaded successfully.")
+
 # Load the saved model
 model_path = "sapling.pth"  # Path to the saved model
 model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))

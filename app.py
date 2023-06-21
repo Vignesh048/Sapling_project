@@ -6,7 +6,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
 import requests
+
 st.header('Sapling Classification')
+
 # Define the image transformation pipeline
 transform = transforms.Compose([
     transforms.Resize((224, 224)),  # Resize images to a consistent size
@@ -17,7 +19,7 @@ transform = transforms.Compose([
 device = torch.device("cpu")
 
 # Pretrained ResNet-18 model
-model = models.resnet18(pretrained=True)
+model = models.resnet18()
 num_features = model.fc.in_features
 
 # Freeze pretrained weights
@@ -34,17 +36,6 @@ model.fc = nn.Sequential(
 )  # Binary classification, output layer with 1 neuron
 
 # Load the saved model
-
-url = "https://storage.googleapis.com/sapling_bucket/sapling.pth"
-filename = "sapling.pth"
-
-response = requests.get(url)
-response.raise_for_status()  # Check if the request was successful
-
-with open(filename, "wb") as file:
-    file.write(response.content)
-
-print("File downloaded successfully.")
 model_path = "sapling.pth"  # Path to the saved model
 model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
@@ -61,14 +52,11 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
 
     # Display the selected image
-    st.image(image, caption='Uploaded Image', use_column_width=True)
+    st.image(image, caption='Uploaded Image')
 
     # Display image size
     image_size = image.size
     st.write('Image Size:', image_size)
-
-    # Add header for sapling classification
-    
 
     # Check if the 'Classify' button is clicked
     if st.button('Classify'):
@@ -84,6 +72,12 @@ if uploaded_file is not None:
             predicted_idx = (output >= 0.5).int()
             predicted_label = class_labels[predicted_idx.item()]
 
-        # Show the classification result
-        st.header('Classification Result: {}'.format(predicted_label))
+        # Set the text color based on the prediction result
+        if predicted_idx == 1:
+            result_color = 'green'
+        else:
+            result_color = 'red'
 
+        # Show the classification result with color
+        st.markdown('<span style="font-size: 48px">Classification Result: </span>'+'<span style="font-size: 48px; color:{}">{}</span>'.format(result_color, predicted_label), unsafe_allow_html=True)
+# f'<span style="font-size: 24px, "color:{}";">{classification_result}</span>'

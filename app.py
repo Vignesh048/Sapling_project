@@ -5,6 +5,7 @@ import streamlit as st
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
+import requests
 st.header('Sapling Classification')
 # Define the image transformation pipeline
 transform = transforms.Compose([
@@ -33,12 +34,23 @@ model.fc = nn.Sequential(
 )  # Binary classification, output layer with 1 neuron
 
 # Load the saved model
+
+url = "https://storage.googleapis.com/sapling_bucket/sapling.pth"
+filename = "sapling.pth"
+
+response = requests.get(url)
+response.raise_for_status()  # Check if the request was successful
+
+with open(filename, "wb") as file:
+    file.write(response.content)
+
+print("File downloaded successfully.")
 model_path = "sapling.pth"  # Path to the saved model
 model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
 
 # Define the class labels
-class_labels = ['Not Sapling', 'Sapling']
+class_labels = ['Not a Sapling', 'Sapling']
 
 # Create a dropdown box to select an image file
 uploaded_file = st.file_uploader("Choose an image file", type=['jpg', 'jpeg', 'png'])

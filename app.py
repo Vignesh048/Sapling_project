@@ -5,7 +5,7 @@ import streamlit as st
 import torch.nn as nn
 import torch.optim as optim
 import torchvision.models as models
-
+st.header('Sapling Classification')
 # Define the image transformation pipeline
 transform = transforms.Compose([
     transforms.Resize((224, 224)),  # Resize images to a consistent size
@@ -13,7 +13,7 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize image data
 ])
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 # Pretrained ResNet-18 model
 model = models.resnet18(pretrained=True)
@@ -33,7 +33,7 @@ model.fc = nn.Sequential(
 )  # Binary classification, output layer with 1 neuron
 
 # Load the saved model
-model_path = r"C:\Users\AMIT PAREEK\Downloads\sapling.pth"  # Path to the saved model
+model_path = "sapling.pth"  # Path to the saved model
 model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 model.eval()
 
@@ -56,7 +56,7 @@ if uploaded_file is not None:
     st.write('Image Size:', image_size)
 
     # Add header for sapling classification
-    st.header('Sapling Classification')
+    
 
     # Check if the 'Classify' button is clicked
     if st.button('Classify'):
@@ -73,4 +73,5 @@ if uploaded_file is not None:
             predicted_label = class_labels[predicted_idx.item()]
 
         # Show the classification result
-        st.write('Classification Result:', predicted_label)
+        st.header('Classification Result: {}'.format(predicted_label))
+
